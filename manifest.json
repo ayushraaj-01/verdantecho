@@ -1,0 +1,21 @@
+{
+  "name": "VerdantEcho — Offline Trail Scout & Bioacoustics",
+  "short_name": "VerdantEcho",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#060d09",
+  "theme_color": "#060d09",
+  "description": "Zero-signal trail scout and bioacoustics AI companion that gets you off the screen and into the backcountry.",
+  "icons": [
+    {
+      "src": "assets/images/chickadee.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg"
+    },
+    {
+      "src": "assets/images/forest_trail.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    }
+  ]
+}

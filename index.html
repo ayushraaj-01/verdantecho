@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VerdantEcho — Offline Bioacoustics, Flora Scout & Frost Almanac</title>
+  <meta name="description" content="Open-source, zero-signal AI trail companion for bioacoustic bird identification, autumn foliage vision, frost planning, and pocket-mode outdoor discovery.">
+  <meta name="theme-color" content="#060d09">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌿</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="manifest" href="manifest.json">
+</head>
+<body>
+  <div class="ambient-glow"></div>
+
+  <!-- Header -->
+  <header class="app-header" id="mainHeader">
+    <div class="brand-wrapper">
+      <div class="brand-icon">🌿</div>
+      <div class="brand-title">
+        <h1>VerdantEcho</h1>
+        <span class="tagline">Zero-Signal Trail Scout & Bioacoustics AI</span>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <div class="status-badge" id="offlineStatusBadge" title="Running 100% client-side without servers">
+        <span class="status-dot"></span>
+        <span id="offlineStatusText">100% Offline AI</span>
+      </div>
+
+      <button type="button" class="btn-header" id="btnSunlightToggle" title="Toggle high-contrast trail mode for bright sunlight">
+        ☀️ <span>Sunlight HUD</span>
+      </button>
+
+      <button type="button" class="btn-header btn-pocket-mode" id="btnPocketModeToggle" title="Touch Grass: Minimize screen time with voice announcements">
+        🌲 <span>Pocket Mode</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Touch Grass Screen-Saver Banner -->
+  <div class="touch-grass-banner" id="touchGrassBanner">
+    <span>🍃 <strong>Touch Grass Philosophy:</strong> Screen time should be the shortest part of your trail adventure.</span>
+    <div class="screen-time-metric">
+      <span>Screen Time Saved:</span>
+      <span class="metric-pill" id="screenSavedTimer">00:00:00</span>
+    </div>
+  </div>
+
+  <main class="container" id="mainContainer">
+    <!-- Hero Banner -->
+    <section class="hero-card" id="heroCard">
+      <img src="assets/images/forest_trail.jpg" alt="Wilderness trail in autumn forest" class="hero-bg-img" id="heroBgImage">
+      <div class="hero-overlay"></div>
+      <div class="hero-content">
+        <div class="hero-pill">Hacktoberfest 2026 • Touch Grass Theme</div>
+        <h2>Open-Source AI Built for the Deep Woods</h2>
+        <p>No cell tower? No problem. VerdantEcho runs open-weight bioacoustic neural models, autumn foliage vision, and frost almanacs directly inside your browser on-device. Zero cloud telemetry, zero subscription fees, zero tracking.</p>
+        <div class="hero-features-chips">
+          <span class="chip">🔊 Bioacoustics Neural FFT</span>
+          <span class="chip">🍁 Autumn Foliage Vision</span>
+          <span class="chip">❄️ Frost & Planting Almanac</span>
+          <span class="chip">📍 GPX Waypoint Logging</span>
+          <span class="chip">🤖 Open-Weight Gemma Companion</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Navigation Tabs -->
+    <nav class="tabs-navigation" id="scoutTabs" aria-label="Scout Modes">
+      <button type="button" class="tab-btn active" id="tabAudioScout" data-target="panelAudio">
+        <span>🔊</span> Bioacoustics Scout
+      </button>
+      <button type="button" class="tab-btn" id="tabFloraScout" data-target="panelFlora">
+        <span>🍁</span> Foliage & Flora Vision
+      </button>
+      <button type="button" class="tab-btn" id="tabFrostAlmanac" data-target="panelFrost">
+        <span>❄️</span> Frost & Soil Almanac
+      </button>
+      <button type="button" class="tab-btn" id="tabFieldJournal" data-target="panelJournal">
+        <span>📔</span> Field Journal & GPX
+        <span class="badge-count" id="journalCountBadge">0</span>
+      </button>
+      <button type="button" class="tab-btn" id="tabGemmaGuide" data-target="panelGemma">
+        <span>🤖</span> Gemma Open AI
+      </button>
+    </nav>
+
+    <!-- Tab 1: Bioacoustics Audio Scout -->
+    <section class="tab-panel active" id="panelAudio" aria-labelledby="tabAudioScout">
+      <div class="scout-grid">
+        <!-- Audio Input & Visualizer Card -->
+        <div class="card" id="audioVisualizerCard">
+          <div class="card-header">
+            <h3 class="card-title"><span>📡</span> Trail Acoustic Spectrum</h3>
+            <span class="card-badge" id="audioModelBadge">AST Onnx / Web Worker</span>
+          </div>
+
+          <div class="canvas-container" id="spectrogramContainer">
+            <canvas id="spectrogramCanvas"></canvas>
+            <div class="canvas-hud">
+              <span id="canvasHzRange">Range: 200 Hz – 12.0 kHz</span>
+              <span id="canvasSampleRate">44.1 kHz • 2048 FFT</span>
+            </div>
+            <div class="canvas-overlay-center" id="canvasPlaceholderOverlay">
+              <span style="font-size: 2rem;">🎙️</span>
+              <span>Tap "Listen on Trail" or select a wildlife sample</span>
+            </div>
+          </div>
+
+          <!-- Controls -->
+          <div class="control-group">
+            <button type="button" class="btn-primary" id="btnMicListen">
+              <span id="micIcon">🎙️</span>
+              <span id="micBtnText">Listen on Trail</span>
+            </button>
+            <button type="button" class="btn-secondary" id="btnStopListen">
+              <span>⏹️</span> Stop
+            </button>
+            <label class="btn-secondary" style="cursor: pointer;">
+              <span>📁</span> Upload Audio File
+              <input type="file" id="audioFileInput" accept="audio/*" style="display: none;">
+            </label>
+          </div>
+
+          <!-- Quick Samples Selector -->
+          <div class="sample-presets-label">Trail Sound Presets (Instant Offline Test):</div>
+          <div class="sample-grid" id="audioSampleGrid">
+            <button type="button" class="btn-sample" data-sample="chickadee" id="sampleChickadee">
+              <span>Chickadee Call</span>
+              <span class="sample-species">Poecile atricapillus</span>
+            </button>
+            <button type="button" class="btn-sample" data-sample="robin" id="sampleRobin">
+              <span>Robin Carol</span>
+              <span class="sample-species">Turdus migratorius</span>
+            </button>
+            <button type="button" class="btn-sample" data-sample="hawk" id="sampleHawk">
+              <span>Red-tailed Hawk</span>
+              <span class="sample-species">Buteo jamaicensis</span>
+            </button>
+            <button type="button" class="btn-sample" data-sample="sparrow" id="sampleSparrow">
+              <span>Song Sparrow</span>
+              <span class="sample-species">Melospiza melodia</span>
+            </button>
+            <button type="button" class="btn-sample" data-sample="crickets" id="sampleCrickets">
+              <span>Fall Crickets</span>
+              <span class="sample-species">Gryllidae bio-clock</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Detection Results Card -->
+        <div class="card" id="audioResultCard">
+          <div class="card-header">
+            <h3 class="card-title"><span>🧬</span> Bioacoustic Identification</h3>
+            <span class="card-badge" id="aiInferenceTime">Inference: 14ms</span>
+          </div>
+
+          <div id="audioDetectionOutput">
+            <div class="result-card detected" id="activeResultCard">
+              <div class="result-header">
+                <div class="result-title-group">
+                  <h3 id="detectedCommonName">Black-capped Chickadee</h3>
+                  <div class="latin-name" id="detectedLatinName">Poecile atricapillus</div>
+                </div>
+                <div class="confidence-gauge">
+                  <span class="confidence-value" id="detectedConfidence">96.4%</span>
+                  <span class="confidence-label">Neural Match</span>
+                </div>
+              </div>
+
+              <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="detectedProgressBar" style="width: 96.4%;"></div>
+              </div>
+
+              <p class="result-details" id="detectedDescription">
+                Distinctive two-note pure whistle "fee-bee" followed by rapid raspy warning "chick-a-dee-dee". Common in deciduous and mixed woods. Highly curious and brave songbird.
+              </p>
+
+              <div class="result-meta-tags" id="detectedMetaTags">
+                <span class="meta-tag">Songbird</span>
+                <span class="meta-tag">Frequency: 3.2 – 6.2 kHz</span>
+                <span class="meta-tag">Conservation: Least Concern</span>
+                <span class="meta-tag">Trail Season: Fall / Winter Active</span>
+              </div>
+            </div>
+
+            <div style="margin-top: 1.25rem; display: flex; gap: 0.75rem;">
+              <button type="button" class="btn-primary" id="btnLogSighting" style="flex: 1;">
+                <span>📌</span> Log to Trail Journal
+              </button>
+              <button type="button" class="btn-secondary" id="btnSpeakResult" title="Read species details aloud">
+                <span>🔊</span> Speak
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab 2: Flora & Foliage Vision Scout -->
+    <section class="tab-panel" id="panelFlora" aria-labelledby="tabFloraScout">
+      <div class="scout-grid">
+        <!-- Image Preview Card -->
+        <div class="card" id="floraPreviewCard">
+          <div class="card-header">
+            <h3 class="card-title"><span>📷</span> Trail Vision Scanner</h3>
+            <span class="card-badge">On-Device Canvas Pipeline</span>
+          </div>
+
+          <div class="image-preview-box" id="imagePreviewBox">
+            <img src="assets/images/sugar_maple.jpg" alt="Sugar Maple Leaf" id="activeFloraImage">
+            <video id="cameraVideo" autoplay playsinline style="display: none;"></video>
+            <div class="image-drop-prompt" id="imageDropPrompt" style="display: none;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+              </svg>
+              <span>Drop trail photo here or tap to upload</span>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label class="btn-primary" style="cursor: pointer;">
+              <span>📁</span> Choose Photo
+              <input type="file" id="floraFileInput" accept="image/*" style="display: none;">
+            </label>
+            <button type="button" class="btn-secondary" id="btnStartCamera">
+              <span>📹</span> Open Camera
+            </button>
+            <button type="button" class="btn-secondary" id="btnCaptureCamera" style="display: none;">
+              <span>📸</span> Capture Frame
+            </button>
+          </div>
+
+          <div class="sample-presets-label">Preloaded Trail Specimens (Click to Scan):</div>
+          <div class="sample-images-grid" id="sampleImagesGrid">
+            <div class="sample-image-card" data-img="sugar_maple" id="sampleImgMaple">
+              <img src="assets/images/sugar_maple.jpg" alt="Sugar Maple">
+              <span class="sample-image-label">Sugar Maple</span>
+            </div>
+            <div class="sample-image-card" data-img="poison_ivy" id="sampleImgIvy">
+              <img src="assets/images/poison_ivy.jpg" alt="Poison Ivy">
+              <span class="sample-image-label">⚠️ Poison Ivy</span>
+            </div>
+            <div class="sample-image-card" data-img="chickadee" id="sampleImgBird">
+              <img src="assets/images/chickadee.jpg" alt="Chickadee">
+              <span class="sample-image-label">Chickadee</span>
+            </div>
+            <div class="sample-image-card" data-img="forest_trail" id="sampleImgTrail">
+              <img src="assets/images/forest_trail.jpg" alt="Autumn Canopy">
+              <span class="sample-image-label">Canopy Foliage</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Flora Detection Results Card -->
+        <div class="card" id="floraResultCard">
+          <div class="card-header">
+            <h3 class="card-title"><span>🔬</span> Botanical & Safety Analysis</h3>
+            <span class="card-badge" id="floraInferenceBadge">Local AI Vision</span>
+          </div>
+
+          <div class="result-card detected" id="activeFloraResultCard">
+            <div class="result-header">
+              <div class="result-title-group">
+                <h3 id="floraCommonName">Sugar Maple (Peak Autumn Foliage)</h3>
+                <div class="latin-name" id="floraLatinName">Acer saccharum</div>
+              </div>
+              <div class="confidence-gauge">
+                <span class="confidence-value" id="floraConfidence">98.2%</span>
+                <span class="confidence-label">Match Score</span>
+              </div>
+            </div>
+
+            <div class="progress-bar-bg">
+              <div class="progress-bar-fill" id="floraProgressBar" style="width: 98.2%;"></div>
+            </div>
+
+            <p class="result-details" id="floraDescription">
+              Peak autumnal anthocyanin transformation. Five palmate lobes with U-shaped sinuses. Native to northeastern hardwood forests. Non-toxic, sap tapped for maple syrup in late winter.
+            </p>
+
+            <div class="result-meta-tags" id="floraMetaTags">
+              <span class="meta-tag">Autumn Senescence: 85% Crimson</span>
+              <span class="meta-tag">Safety: Completely Safe</span>
+              <span class="meta-tag">Canopy: Hardwood Deciduous</span>
+            </div>
+          </div>
+
+          <div style="margin-top: 1.25rem; display: flex; gap: 0.75rem;">
+            <button type="button" class="btn-primary" id="btnLogFlora" style="flex: 1;">
+              <span>📌</span> Log Flora Finding
+            </button>
+            <button type="button" class="btn-secondary" id="btnSpeakFlora">
+              <span>🔊</span> Speak
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab 3: Frost & Soil Almanac -->
+    <section class="tab-panel" id="panelFrost" aria-labelledby="tabFrostAlmanac">
+      <div class="card" style="margin-bottom: 1.5rem;">
+        <div class="card-header">
+          <h3 class="card-title"><span>❄️</span> October Frost & Microclimate Forecaster</h3>
+          <span class="card-badge" id="frostZoneBadge">USDA Zone 6b (Automated)</span>
+        </div>
+        <p style="color: var(--text-secondary); margin-bottom: 1.25rem; font-size: 0.92rem;">
+          Calculate first frost likelihood and ideal cold-hardy garden sowing windows based on offline latitude estimation.
+        </p>
+
+        <div class="almanac-metrics-row">
+          <div class="metric-card">
+            <span class="metric-title">Estimated First Hard Frost</span>
+            <span class="metric-big-num" id="firstFrostDate">Oct 26</span>
+            <span class="metric-sub" id="frostDaysRemaining">~15 days remaining</span>
+          </div>
+          <div class="metric-card">
+            <span class="metric-title">Current Trail Season</span>
+            <span class="metric-big-num">Mid Fall</span>
+            <span class="metric-sub">Golden hour: 5:48 PM</span>
+          </div>
+          <div class="metric-card">
+            <span class="metric-title">Soil Temp Range</span>
+            <span class="metric-big-num">52°F – 58°F</span>
+            <span class="metric-sub">Optimal for alliums & brassicas</span>
+          </div>
+        </div>
+
+        <h4 style="color: #fff; font-size: 1.05rem; margin-top: 1rem; margin-bottom: 0.5rem;">
+          🌱 What to Plant & Forage This Week:
+        </h4>
+        <div class="planting-table-container">
+          <table class="almanac-table" id="almanacTable">
+            <thead>
+              <tr>
+                <th>CROP / SPECIMEN</th>
+                <th>WINDOW</th>
+                <th>ACTION</th>
+                <th>FROST TOLERANCE</th>
+                <th>TRAIL / GARDEN NOTE</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Hardneck Garlic</strong></td>
+                <td>Oct 10 – Nov 15</td>
+                <td><span class="tag-frost-status sow-now">Sow Now</span></td>
+                <td>Sub-zero hardy</td>
+                <td>Plant cloves 2 inches deep, cover with 4 inches straw mulch.</td>
+              </tr>
+              <tr>
+                <td><strong>Winter Rye Cover Crop</strong></td>
+                <td>Oct 01 – Oct 25</td>
+                <td><span class="tag-frost-status sow-now">Broadcast Seed</span></td>
+                <td>Extreme hardiness</td>
+                <td>Prevents autumn erosion and locks nitrogen in soil.</td>
+              </tr>
+              <tr>
+                <td><strong>Winter Spinach (Bloomsdale)</strong></td>
+                <td>Late Autumn</td>
+                <td><span class="tag-frost-status sow-now">Direct Sow</span></td>
+                <td>Hardy to 20°F</td>
+                <td>Overwinters under cold frames for early March harvest.</td>
+              </tr>
+              <tr>
+                <td><strong>Winter Squash & Pumpkins</strong></td>
+                <td>Immediate</td>
+                <td><span class="tag-frost-status harvest">Harvest Before Frost</span></td>
+                <td>Frost sensitive</td>
+                <td>Rind will soften if caught in hard freeze. Cure in dry warmth.</td>
+              </tr>
+              <tr>
+                <td><strong>Wild Chanterelles / Hen of Woods</strong></td>
+                <td>Early–Mid Oct</td>
+                <td><span class="tag-frost-status harvest">Forage on Oak Stumps</span></td>
+                <td>Moderate</td>
+                <td>Look at base of mature oak trees after autumn rain.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab 4: Field Journal & GPX Exporter -->
+    <section class="tab-panel" id="panelJournal" aria-labelledby="tabFieldJournal">
+      <div class="card">
+        <div class="journal-actions">
+          <div>
+            <h3 class="card-title" style="margin-bottom: 0.25rem;"><span>📔</span> Trail Sightings Log</h3>
+            <span style="font-size: 0.8rem; color: var(--text-dim);">Stored locally in browser IndexedDB. Zero cloud leaks.</span>
+          </div>
+
+          <div style="display: flex; gap: 0.6rem;">
+            <button type="button" class="btn-primary" id="btnExportGPX">
+              <span>🗺️</span> Export GPX Track
+            </button>
+            <button type="button" class="btn-secondary" id="btnExportGeoJSON">
+              <span>🌐</span> Export GeoJSON
+            </button>
+            <button type="button" class="btn-secondary" id="btnClearJournal" style="color: #f87171;">
+              <span>🗑️</span> Clear
+            </button>
+          </div>
+        </div>
+
+        <div class="sightings-list" id="sightingsListContainer">
+          <!-- Populated by JS -->
+          <div style="text-align: center; padding: 3rem; color: var(--text-muted);" id="emptyJournalNotice">
+            No sightings logged yet. Use the Bioacoustics or Flora Scout to log your first trail observation!
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab 5: Open-Weight Gemma Naturalist Companion -->
+    <section class="tab-panel" id="panelGemma" aria-labelledby="tabGemmaGuide">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title"><span>🤖</span> Open-Weight Gemma 2B Naturalist Engine</h3>
+          <span class="card-badge">Partner Category: Best Use of Gemma</span>
+        </div>
+
+        <p style="color: var(--text-secondary); margin-bottom: 1.25rem; font-size: 0.95rem; line-height: 1.6;">
+          VerdantEcho leverages Google's open-weight <strong>Gemma 2B</strong> model as an on-device ecological field guide. Because Gemma is open-weight, it runs entirely on consumer hardware (laptops, edge devices, Raspberry Pi) without requiring an internet connection or transmitting sensitive GPS coordinates to cloud servers.
+        </p>
+
+        <div class="scout-grid" style="margin-bottom: 1.5rem;">
+          <div class="result-card detected">
+            <h4 style="color: #fff; margin-bottom: 0.5rem;">🌿 Gemma Naturalist Prompt Template:</h4>
+            <pre style="background: rgba(0,0,0,0.5); padding: 1rem; border-radius: var(--radius-sm); font-family: var(--font-mono); font-size: 0.78rem; color: #86efac; overflow-x: auto; white-space: pre-wrap;">
+&lt;start_of_turn&gt;user
+You are VerdantEcho, an offline backcountry naturalist on an autumn trail.
+The hiker just observed: Black-capped Chickadee (Poecile atricapillus)
+Confidence: 96.4%
+Elevation: 1,420 ft
+Date: October 11, 2026
+In 2 brief sentences, tell the hiker what behavioral cue to watch for right now, then encourage them to put their screen away.&lt;end_of_turn&gt;
+&lt;start_of_turn&gt;model
+Watch for chickadees hiding sunflower and conifer seeds under tree bark crevices—they cache up to 100,000 food items each fall! Now slip this device in your pack and listen for their companion nuthatches foraging nearby.&lt;end_of_turn&gt;
+            </pre>
+          </div>
+
+          <div class="result-card">
+            <h4 style="color: #fff; margin-bottom: 0.5rem;">💻 Run Locally via Python CLI:</h4>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.75rem;">
+              We have bundled <code style="color: #86efac;">gemma_field_scout.py</code> in the repository. Run it offline:
+            </p>
+            <pre style="background: rgba(0,0,0,0.5); padding: 0.85rem; border-radius: var(--radius-sm); font-family: var(--font-mono); font-size: 0.78rem; color: #fde68a;">
+python gemma_field_scout.py --species "Sugar Maple" --foliage "crimson"
+            </pre>
+            <button type="button" class="btn-primary" id="btnTestGemmaQuery" style="margin-top: 1rem; width: 100%;">
+              <span>⚡</span> Run Interactive Field Query
+            </button>
+          </div>
+        </div>
+
+        <div id="gemmaOutputBox" style="display: none; background: rgba(34, 197, 94, 0.1); border: 1px solid var(--accent-moss); border-radius: var(--radius-md); padding: 1.25rem;">
+          <h4 style="color: #86efac; margin-bottom: 0.5rem;">Naturalist Response:</h4>
+          <p id="gemmaResponseText" style="color: #fff; font-size: 0.95rem; line-height: 1.6;"></p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Pocket Mode Fullscreen AMOLED HUD -->
+  <div class="pocket-mode-overlay" id="pocketModeOverlay">
+    <div class="pocket-hud-header">
+      <span class="pocket-hud-badge">🌿 TOUCH GRASS POCKET HUD ACTIVE</span>
+      <span class="pocket-hud-instructions">Screen power minimized. Naturalist voice synthesized.</span>
+    </div>
+
+    <div class="pocket-hud-center">
+      <div class="pocket-pulse-ring">
+        <span>👂</span>
+      </div>
+      <div class="pocket-hud-timer" id="pocketTimerDisplay">00:00</div>
+      <div class="pocket-hud-last-spotted" id="pocketLastSpottedText">
+        Listening for trail calls...
+      </div>
+    </div>
+
+    <div>
+      <p style="color: #6ee7b7; font-size: 0.85rem; margin-bottom: 1.25rem;">
+        Keep phone in your pocket or chest strap. Chimes & voice will announce sightings automatically.
+      </p>
+      <button type="button" class="btn-primary" id="btnExitPocketMode" style="background: #22c55e; color: #000; font-weight: 800;">
+        <span>✕</span> Exit Pocket Mode & View Log
+      </button>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="app-footer">
+    <div class="footer-content">
+      <div>
+        <p style="font-weight: 700; color: #fff; margin-bottom: 0.25rem;">VerdantEcho • Built for Hacktoberfest 2026</p>
+        <p>100% Client-Side Open-Source AI. No Cloud Tracking. Made to get you outdoors.</p>
+      </div>
+      <div class="footer-tags">
+        <span class="footer-tag">#hf26challenge</span>
+        <span class="footer-tag">Open-Weight AI</span>
+        <span class="footer-tag">Bioacoustics FFT</span>
+        <span class="footer-tag">Gemma Companion</span>
+        <span class="footer-tag">Zero Telemetry</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

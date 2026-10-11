@@ -1,0 +1,22 @@
+{
+  "name": "verdant-echo",
+  "version": "1.0.0",
+  "description": "Zero-signal trail scout and bioacoustics AI companion that gets you off the screen and into the backcountry.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "cli": "python gemma_field_scout.py"
+  },
+  "keywords": [
+    "touch-grass",
+    "open-source-ai",
+    "bioacoustics",
+    "gemma",
+    "hf26challenge",
+    "offline-first",
+    "pwa"
+  ],
+  "author": "Ayush Raj",
+  "license": "MIT"
+}
